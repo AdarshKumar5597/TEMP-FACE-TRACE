@@ -1,0 +1,270 @@
+{% load static tailwind_tags %}
+{% load static %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Yanone+Kaffeesatz:wght@400;600&display=swap"
+        rel="stylesheet">
+    {% tailwind_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: grid;
+            grid-template-rows: 7vh 55vh 38vh;
+            grid-template-columns: 14% 86%;
+            grid-template-areas:
+                "nav nav"
+                "side main"
+                "side display";
+        }
+
+        #nav-bar {
+            grid-area: nav;
+        }
+
+        #side-bar {
+            grid-area: side;
+        }
+
+        #main {
+            grid-area: main;
+        }
+
+        #display {
+            grid-area: display;
+        }
+
+        .db-li::before {
+            border-right: 4px solid white;
+            border-top: 4px solid white;
+            border-bottom: 4px solid white;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            color: white;
+            background-color: #e84949;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition-duration: 200ms;
+            transition-timing-function: linear;
+            transition-property: all;
+        }
+
+        .db-li:hover::before {
+            transform: scaleX(1);
+        }
+
+        .db-li:hover p {
+            color: white;
+            transform-origin: left;
+            transition-duration: 200ms;
+            transition-property: all;
+            transition-timing-function: linear;
+            z-index: 20;
+        }
+
+        .db-li:hover i {
+            color: white;
+            transform-origin: left;
+            transition-duration: 200ms;
+            transition-property: all;
+            transition-timing-function: linear;
+            z-index: 20;
+        }
+
+        .web-cam {
+            width: 300px;
+            height: 300px;
+            border-radius: 150px;
+            padding: 2px;
+            /* -webkit-mask-image: -webkit-radial-gradient(circle, white 100%, black 100%); */
+        }
+    </style>
+</head>
+
+<body>
+    {% load static %}
+    <!--navbar-->
+    <div id="nav-bar" class="bg-red-500 relative flex items-center">
+        <img src="../media/images/logo.png" alt="" class="h-[100%] w-[14%]">
+    </div>
+    <!--sidebar-->
+    <div id="side-bar" class="bg-white">
+        <ul class="flex flex-col gap-y-3">
+
+            <a href="{% url 'AdminDashboard' %}">
+                <li class="flex flex-row font-pop font-bold text-xl mt-16 py-3 db-li relative">
+                    <i class='bx bxs-dashboard ml-14 mr-6'></i>
+                    <p>Dashboard</p>
+                </li>
+            </a>
+            <a href="{% url 'Profile' %}">
+                <li class="flex flex-row font-pop font-bold text-xl py-3 db-li relative">
+                    <i class='bx bxs-user-circle ml-14 mr-6'></i>
+                    <p>Profile</p>
+                </li>
+            </a>
+            <a href="{% url 'Queries' %}">
+                <li class="flex flex-row font-pop font-bold text-xl py-3 db-li relative">
+                    <i class='bx bxs-envelope ml-14 mr-6'></i>
+                    <p>Queries</p>
+                </li>
+            </a>
+            <a href="{% url 'Logout' %}">
+                <li class="flex flex-row font-pop font-bold text-xl mt-20 py-3 db-li relative logout">
+                    <i class='bx bx-log-out ml-14 mr-6'></i>
+                    <p>Logout</p>
+                </li>
+            </a>
+
+        </ul>
+    </div>
+    <!--main-->
+    <div id="main" class="bg-gray-300 p-10 flex items-center rounded-tl-full">
+        <div class="rounded-lg border-white relative h-[49.5vh] w-[99.7vw] flex items-center justify-between px-3">
+            <div
+                class="flex bg-[#e84949] flex-col justify-center gap-y-3 rounded-md rounded-tl-full border-white border-[2px] h-[65%] p-5 self-end mb-2">
+                <i class='bx bxs-camera text-white text-xl' id="camera-access"></i>
+                <i class='bx bxs-toggle-right text-white text-xl'></i>
+                <i class='bx bx-toggle-right text-white text-xl'></i>
+            </div>
+
+            <!--Video Section-->
+            <video class="rounded-lg border-white border-[1px] web-cam self-end mb-8" id="vid"></video>
+
+
+            <!--MANUAL ATTENDANCE SECTION-->
+            <div
+                class="bg-[#e84949] rounded-2xl w-[46%] h-[95%] border-white border-[1px] flex items-center justify-center mr-3 rounded-tl-full">
+                <form action="" class="w-[95%] h-[92%] bg-white rounded-2xl p-6 space-y-4 shadow-black shadow-2xl manual-attendance"
+                    method="post">{% csrf_token %}
+
+                    <!-- StudentId input -->
+                    <div class="relative mb-6" data-te-input-wrapper-init>
+                        <input type="text" name="studentid1" class="peer block min-h-[auto] w-full rounded border border-neutral-500 bg-transparent px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-0 motion-reduce:transition-none text-neutral-900                            
+                        [&:not([data-te-input-placeholder-active])]:placeholder:opacity-100 inputSid1"
+                            placeholder="Student Id" required />
+
+                    </div>
+
+                    <!-- Confirm input -->
+                    <div class="relative mb-6" data-te-input-wrapper-init>
+                        <input type="text" name="studentid2" class="peer block min-h-[auto] w-full rounded border border-neutral-500 bg-transparent px-3 py-[0.32rem] leading-[2.15] outline-none transition-all duration-200 ease-linear focus:placeholder:opacity-100 data-[te-input-state-active]:placeholder:opacity-0 motion-reduce:transition-none text-neutral-900                            
+                        [&:not([data-te-input-placeholder-active])]:placeholder:opacity-100 inputSid2"
+                            placeholder="Confirm Student Id" required />
+                    </div>
+
+
+                    <!-- Submit button -->
+                    <div class="text-center lg:text-left">
+                            <button type="submit"
+                                class="inline-block rounded bg-blue-600 px-7 pb-2.5 pt-3 text-sm font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-1000 ease-in-out hover:bg-blue-800 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]  attendancesubmit"
+                                data-te-ripple-init data-te-ripple-color="light">Submit
+                            </button>
+                        <!-- Register link -->
+                        <p class="mb-0 mt-2 pt-1 text-sm font-semibold">
+                            Register new student?
+                            <a href="#!"
+                                class="text-red-600 transition duration-300 ease-in-out hover:text-red-800 focus:text-danger-600 active:text-danger-700">Register</a>
+                        </p>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!--display-->
+    <div id="display" class="bg-gray-300 flex justify-center items-center">
+        <div class="rounded-lg border-white relative h-[99%] w-[95%] flex items-center justify-evenly mb-5">
+            <div
+                class="bg-[#e84949] flex flex-col gap-y-3 rounded-md border-white border-[1px] h-[95%] p-5 ml-1 items-center justify-center">
+                <p class="text-white font-bold text-xl font-pop">D</p>
+                <p class="text-white font-bold text-xl font-pop">O</p>
+                <p class="text-white font-bold text-xl font-pop">M</p>
+                <p class="text-white font-bold text-xl font-pop">A</p>
+                <p class="text-white font-bold text-xl font-pop">I</p>
+                <p class="text-white font-bold text-xl font-pop">N</p>
+                <p class="text-white font-bold text-xl font-pop">S</p>
+            </div>
+            <!--SCROLL SECTION FOR DOMAINS-->
+            <div class="rounded-lg  flex items-center w-[95%] h-[95%] overflow-visible gap-x-2 overflow-y-hidden">
+                {% for detail in details %}
+                <div
+                    class="bg-[#e84949] rounded-md domain h-[100%] max-w-[600px] border-[1px] flex flex-col gap-y-5 shadow-black shadow-lg">
+                    <h1 class="text-white font-pop text-2xl font-extrabold text-center mt-2">{{detail.domain_name}}</h1>
+                    <div class="h-2 w-10 bg-white mx-auto"></div>
+                    <!--IMPLEMENT FOR SCROLL FOR OTHER MEMBERS DETAILS-->
+
+                    {% for student in detail.details %}
+                    <div class="flex items-center justify-between px-4 w-[600px]">
+                        <img src="{{student.image}}" class="rounded-full" alt="" height="40px" width="40px">
+                        <p class="text-white font-pop text-xl w-[25%]">{{student.studentname}}</p>
+                        <p class="text-white font-pop text-lg w-[25%]">{{student.studentid}}</p>
+                        <p class="text-white font-pop text-lg w-[15%]">{{student.attendance}}%</p>
+                    </div>
+                    {% endfor %}
+                    <!--END OF MEMBERS SECTION-->
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <script src="../media/index.js"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</body>
+
+<script>
+
+    // to handle mis logout function using arrows button on browser.
+    btnlogout = document.querySelectorAll('.logout')
+    btnlogout[0].addEventListener('click', function () {
+        history.replaceState(null, null, '/login');
+    })
+
+    document.querySelectorAll('.manual-attendance')[0].addEventListener("submit", function(event) {
+        event.preventDefault();
+        var sid1 = document.querySelectorAll('.inputSid1')[0].value;
+        var sid2 = document.querySelectorAll('.inputSid2')[0].value;
+        var fetched_data
+        if (sid1 != sid2) {
+            alert('Student Id mismatch. Re-enter correct student id.')
+        }
+        else {
+            fetch('/get-data/')
+                .then(response => response.json())
+                .then(data => {
+                    fetched_data = data
+                    if (fetched_data.studentid_list.includes(Number(sid1)) == false) {
+                        alert(`Student Id ${sid1} not registered.`)
+                    }
+                    else {
+                        if (fetched_data.present_student_list.includes(Number(sid1)) != false) {
+                            alert(`Attendance of ${sid1} is already taken.`)
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.log('Error fetching data: ', error)
+                })
+        }      
+        document.querySelector('.manual-attendance').submit();
+    })
+    
+</script>
+
+</html>

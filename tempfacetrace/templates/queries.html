@@ -1,0 +1,135 @@
+{% load static tailwind_tags %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Queries</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Yanone+Kaffeesatz:wght@400;600&display=swap"
+        rel="stylesheet">
+        {% tailwind_css %}
+    <style>
+        .circle1 {
+            height: 200px;
+            width: 200px;
+            background-color: red;
+            box-shadow: 0 0 10px 20px red;
+            left: 10vw;
+            border-radius: 50%;
+            top: 10vh;
+            animation: circle1movement;
+            animation-duration: 8s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            transition-delay: 1s;
+        }
+        @keyframes circle1movement {
+            0% {
+                left: 10vw;
+                top: 10vh;
+                height: 200px;
+                width: 200px;
+            }
+            50% {
+                top : 5vh;
+                left: 15vw;
+                height: 300px;
+                width: 300px;
+            }
+            100% {
+                left: 10vw;
+                top: 10vh;
+                height: 200px;
+                width: 200px;
+            }
+        }
+        .circle2 {
+            height: 200px;
+            width: 200px;
+            background-color: yellow;
+            box-shadow: 0 0 10px 20px yellow;
+            right: 10vw;
+            border-radius: 50%;
+            bottom: 10vh;
+            animation: circle2movement;
+            animation-duration: 8s;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            transition-delay: 1s;
+        }
+        @keyframes circle2movement {
+            0% {
+                right: 10vw;
+                bottom: 10vh;
+                height: 300px;
+                width: 300px;
+            }
+            50% {
+                right: 15vw;
+                bottom : 5vh;
+                height: 250px;
+                width: 250px;
+            }
+            100% {
+                right: 10vw;
+                bottom: 10vh;
+                height: 300px;
+                width: 300px;
+            }
+        }
+
+    </style>
+</head>
+
+<body class="relative bg-black overflow-hidden flex flex-col">
+    <h1 class="font-yanone font-extrabold text-white text-[100px] mx-auto">QUERIES</h1>
+    <div class="absolute circle1"></div>
+    <div class="absolute circle2"></div>
+
+
+    <div class="bg-black w-[100vw] h-[calc(100vh-100px)] flex flex-col items-center pb-20 overflow-scroll gap-y-4 overflow-x-hidden">
+
+
+
+
+
+        {% for query in queries %}
+        <!--QUERY 1-->
+        <div class="w-[70vw] h-[60vh] rounded-3xl bg-gray-300 opacity-40 flex">
+            <div class="flex flex-col gap-x-4 items-stretch w-[70vw] p-10">
+                <div class="border-b-[2px] border-black flex gap-x-4 justify-between items-center">
+
+                    <!--PROFILE PICTURE-->
+
+                    <img src="../media/{{query.image}}" height="80px" class="rounded-full" width="80px" alt="">
+
+                    <!--STUDENT NAME-->
+                    <h1 class="font-yanone font-extrabold text-black text-[40px]">
+                        {{query.studentname}}
+                    </h1>
+                    <!--STUDENT ID-->
+                    <h1 class="font-yanone font-extrabold text-black text-[40px]">
+                        {{query.studentid}}
+                    </h1>
+                    <div>
+                        <p class="font-yanone font-extrabold text-black text-[40px]">
+                            Query Received - {{query.date}}
+                        </p>
+                    </div>
+                </div>
+                <div class="my-auto overflow-scroll overflow-x-hidden">
+                    <p class="font-yanone font-bold text-[40px] text-black">{{query.query}}</p>
+                    
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+
+
+    </div>
+</body>
+
+</html>

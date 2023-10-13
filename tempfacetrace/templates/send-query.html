@@ -1,0 +1,204 @@
+{% load static tailwind_tags %}
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Query</title>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&family=Yanone+Kaffeesatz:wght@400;600&display=swap"
+        rel="stylesheet">
+        {% tailwind_css %}
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            display: grid;
+            grid-template-rows: 7vh 55vh 38vh;
+            grid-template-columns: 14% 86%;
+            grid-template-areas:
+                "nav nav"
+                "side main"
+                "side main";
+        }
+
+        #nav-bar {
+            grid-area: nav;
+        }
+
+        #side-bar {
+            grid-area: side;
+        }
+
+        #main {
+            grid-area: main;
+        }
+
+        #display {
+            grid-area: display;
+        }
+
+        .db-li::before {
+            border-right: 4px solid white;
+            border-top: 4px solid white;
+            border-bottom: 4px solid white;
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            color: white;
+            background-color: #e84949;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition-duration: 200ms;
+            transition-timing-function: linear;
+            transition-property: all;
+        }
+
+        .db-li:hover::before {
+            transform: scaleX(1);
+        }
+
+        .db-li:hover p {
+            color: white;
+            transform-origin: left;
+            transition-duration: 200ms;
+            transition-property: all;
+            transition-timing-function: linear;
+            z-index: 20;
+        }
+
+        .db-li:hover i {
+            color: white;
+            transform-origin: left;
+            transition-duration: 200ms;
+            transition-property: all;
+            transition-timing-function: linear;
+            z-index: 20;
+        }
+        .web-cam { 
+            height: 85%;
+            width: 35%;
+            border-radius: 100%;
+            padding: 2px;
+        }
+        
+    </style>
+</head>
+
+<body>
+    <!--navbar-->
+    <div id="nav-bar" class="bg-gray-300 relative flex items-center">
+        <img src="../media/images/logo.png" alt="" class="h-[100%] w-[14%]">
+    </div>
+    <!--sidebar-->
+    <div id="side-bar" class="bg-white">
+        <ul class="flex flex-col gap-y-3">
+            <a href="{% url 'Student' %}">
+                <li class="flex flex-row font-pop font-bold text-xl mt-16 py-3 db-li relative">
+                    <i class='bx bxs-dashboard ml-14 mr-6'></i>
+                    <p>Dashboard</p>
+                </li>
+            </a>
+            <a href="{% url 'Profile' %}">
+                <li class="flex flex-row font-pop font-bold text-xl py-3 db-li relative">
+                    <i class='bx bxs-user-circle ml-14 mr-6'></i>
+                    <p>Profile</p>
+                </li>
+            </a>
+            <a href="{% url 'SendQuery' %}">
+                <li class="flex flex-row font-pop font-bold text-xl py-3 db-li relative">
+                    <i class='bx bxs-envelope ml-14 mr-6'></i>
+                    <p>Send Query</p>
+                </li>
+            </a>
+            <a href="{% url 'Logout' %}">
+                <li class="flex flex-row font-pop font-bold text-xl mt-20 py-3 db-li relative logout">
+                    <i class='bx bx-log-out ml-14 mr-6'></i>
+                    <p>Logout</p>
+                </li>
+            </a>
+        </ul>
+    </div>
+    <!--main-->
+    <div id="main" class="bg-[#e84949] p-32 flex flex-col justify-evenly items-center rounded-tl-full rounded-bl-full">
+
+            <form action="" class="bg-white flex flex-col gap-y-4 justify-center items-center w-full h-full rounded-tl-full rounded-bl-full content mx-auto p-10 opacity-70 send-query" method="post">{% csrf_token %}
+                <h1 class="font-pop text-black text-2xl font-extrabold">
+                    QUERY
+                </h1>
+                
+                <div class="flex gap-x-4 items-center justify-center w-full">
+                    <div class="flex flex-col mt-10 gap-y-3">
+                        
+                        <div class="flex flex-col">
+                            <label for="email" class="">Email</label>
+                            <input type="email" name="email" id="email"
+                                class="h-12 w-60 border-gray-300 border-[1px] rounded-lg bg-[#f5b4e6] p-2 text-red-700 font-bold font-pop focus:border-none email"
+                                style="outline: none;" required>
+                        </div>
+
+                        <div class="flex flex-col">
+                            <label for="password" class="">Password</label>
+                            <input type="password" name="password" id="password"
+                                class="h-12 w-60 border-gray-300 border-[1px] rounded-lg bg-[#f5b4e6] p-2 text-red-700 font-bold font-pop focus:border-none password"
+                                style="outline: none;" required>
+                        </div>
+
+                    </div> 
+
+                    <div class=" flex flex-col items-center">
+                        <label for="">Write Query</label>
+                        <textarea name="querybox" id="" cols="60" rows="10" class="border-[2px] border-black p-4" required></textarea>
+                    </div> 
+               </div>
+
+                <button type="submit" class="mt-10 p-4 px-10 bg-[#e84949] rounded-lg shadow-black shadow-md text-white font-bold font-pop">
+                    SUBMIT
+                </button>
+
+            </form>
+        </div>
+        
+    </div>
+</body>
+
+<script>
+    btnlogout = document.querySelectorAll('.logout')
+    btnlogout[0].addEventListener('click', function () {
+        history.replaceState(null, null, '/login');
+    })
+
+    document.querySelectorAll('.send-query')[0].addEventListener('submit', function(event) {
+        event.preventDefault();
+        var email = document.querySelectorAll('.email')[0].value;
+        var password = document.querySelectorAll('.password')[0].value;
+        var userIsValidApi = `/user-is-valid/?param1=${email}&param2=${password}`
+
+
+        var isValid
+        fetch(userIsValidApi)
+            .then(response => response.json())
+            .then(data => {
+                isValid = data.result;
+                if (isValid == 'False') {
+                    alert(`Invalid Credentials`)
+                }
+            }).catch(error=>{
+                alert(`Error in handling data: ${error}`)
+            })
+            document.querySelector('.send-query').submit();
+    })
+
+
+</script>
+
+</html>

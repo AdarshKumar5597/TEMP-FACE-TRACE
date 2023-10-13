@@ -1,0 +1,124 @@
+{% load static tailwind_tags %}
+<html lang="en">
+
+<head>
+    {% tailwind_css %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login</title>
+    <style>
+        :root {
+            --custom-red: #e84949;
+            --custom-border-grad:
+        }
+
+        .content {
+            box-shadow: 15px 0px 50px 10px black;
+        }
+
+        .scanner {
+            border: 10px solid;
+            border-image-slice: 1;
+            border-width: 10px;
+            border-image-source: linear-gradient(to left, #00C853, #B2FF59);
+        }
+
+        .scanner-bar {
+            background-image: linear-gradient(to left, #1bc800, #fff959);
+            animation: linear-movement;
+            animation-duration: 2s;
+            animation-timing-function: ease-in;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes linear-movement {
+            0% {
+                top: 120px
+            }
+
+            50% {
+                top: 390px
+            }
+
+            100% {
+                top: 120px
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#E7E2FF] relative">
+    <div class="bg-[#f5b4e6] w-full h-full flex items-center justify-center">
+
+
+        <div class="absolute top-16 left-[380px] h-16 w-16 rounded-full bg-[#e84949]"></div>
+
+
+        <div class="absolute h-60 w-60 rounded-full bg-white bottom-6 right-[300px] z-10"></div>
+
+
+
+        <div class="max-w-[1080px] w-11/12 mx-auto my-auto flex bg-[#e84949] relative min-h-[680px] rounded-3xl">
+            <form action="" method="post"
+                class="bg-white flex flex-col gap-y-4 justify-center items-center w-[50%] mb-0 rounded-3xl shadow-gray-500 shadow-lg content">
+                <h1 class="font-pop text-black text-2xl font-extrabold"> {% csrf_token %}
+                    LOGIN
+                </h1>
+                <p class="font-pop">How do I get started?</p>
+
+                <div class="flex flex-col mt-10 gap-y-3">
+
+                    <div class="flex flex-col">
+                        <label for="" class="">Email</label>
+                        <input type="email" name="email"
+                            class="h-12 w-60 border-gray-300 border-[1px] rounded-lg bg-[#f5b4e6] p-2 text-red-700 font-bold font-pop focus:border-none"
+                            style="outline: none;" required>
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="" class="">Password</label>
+                        <input type="password" name="password"
+                            class="h-12 w-60 border-gray-300 border-[1px] rounded-lg bg-[#f5b4e6] p-2 text-red-700 font-bold font-pop focus:border-none"
+                            style="outline: none;" required>
+
+                    </div>
+
+                    {% for field in login_form %}
+                    <p>
+                        {% for error in field.errors %}
+                    <p style="color: red">{{ error }}</p>
+                    {% endfor %}
+                    </p>
+                    {% endfor %}
+                    {% if login_form.non_field_errors %}
+                    <div style="color: red">
+                        <p>{{login_form.non_field_errors}}</p>
+                    </div>
+                    {% endif %}
+
+
+                </div>
+
+                <button type="submit"
+                    class="mt-10 p-4 px-10 bg-[#e84949] rounded-lg shadow-black shadow-md text-white font-bold font-pop">
+                    Login
+                </button>
+
+
+                <div class="flex gap-x-2 font-pop">
+                    <p>Don't have account?</p>
+                    <a href="/register" class="font-pop font-bold">Register</a>
+                </div>
+
+            </form>
+            <div class="w-[50%] relative">
+                <div class="absolute w-[300px] rounded-full h-[10px] scanner-bar top-[200] z-30 right-[120]"></div>
+                <div class="absolute w-[350px] h-[320px] scanner top-[100] right-[100] rounded-3xl z-10"></div>
+                <img src="../media/images/8f6ca0d9719dbc345b33465db44f06d9.jpg"
+                    class="absolute h-[500px] w-[350px] rounded-3xl top-[100] right-[100]" alt="">
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
