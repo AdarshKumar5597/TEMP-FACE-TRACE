@@ -101,6 +101,7 @@
     <!--navbar-->
     <div id="nav-bar" class="bg-red-500 relative flex items-center">
         <img src="../media/images/logo.png" alt="" class="h-[100%] w-[14%]">
+        <p class="font-bold text-white text-4xl mx-auto">Admin - Dashboard</p>
     </div>
     <!--sidebar-->
     <div id="side-bar" class="bg-white">
@@ -138,19 +139,30 @@
         <div class="rounded-lg border-white relative h-[49.5vh] w-[99.7vw] flex items-center justify-between px-3">
             <div
                 class="flex bg-[#e84949] flex-col justify-center gap-y-3 rounded-md rounded-tl-full border-white border-[2px] h-[65%] p-5 self-end mb-2">
-                <i class='bx bxs-camera text-white text-xl' id="camera-access"></i>
+                <i class='bx bxs-camera text-white text-xl hover:cursor-pointer hover:scale-[200%] transition-all duration-200' id="camera-access"></i>
                 <i class='bx bxs-toggle-right text-white text-xl'></i>
                 <i class='bx bx-toggle-right text-white text-xl'></i>
             </div>
 
             <!--Video Section-->
-            <video class="rounded-lg border-white border-[1px] web-cam self-end mb-8" id="vid"></video>
+            <!--loading part-->
+            <div class="hidden loader justify-center">
+                <div
+                    class='flex space-x-2 justify-center items-center bg-white dark:invert w-[200px] h-[100px] bg-inherit'>
+                    <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+                    <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+                    <div class='h-8 w-8 bg-black rounded-full animate-bounce'></div>
+                </div>
+                <span class="text-white text-xl font-bold">Loading...</span>
+            </div>
+            <img class="rounded-lg border-white border-[1px] self-end mb-8 w-[500px] h-[300px] hidden" id="video">
 
 
             <!--MANUAL ATTENDANCE SECTION-->
             <div
                 class="bg-[#e84949] rounded-2xl w-[46%] h-[95%] border-white border-[1px] flex items-center justify-center mr-3 rounded-tl-full">
-                <form action="" class="w-[95%] h-[92%] bg-white rounded-2xl p-6 space-y-4 shadow-black shadow-2xl manual-attendance"
+                <form action=""
+                    class="w-[95%] h-[92%] bg-white rounded-2xl p-6 space-y-4 shadow-black shadow-2xl manual-attendance"
                     method="post">{% csrf_token %}
 
                     <!-- StudentId input -->
@@ -171,10 +183,10 @@
 
                     <!-- Submit button -->
                     <div class="text-center lg:text-left">
-                            <button type="submit"
-                                class="inline-block rounded bg-blue-600 px-7 pb-2.5 pt-3 text-sm font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-1000 ease-in-out hover:bg-blue-800 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]  attendancesubmit"
-                                data-te-ripple-init data-te-ripple-color="light">Submit
-                            </button>
+                        <button type="submit"
+                            class="inline-block rounded bg-blue-600 px-7 pb-2.5 pt-3 text-sm font-medium uppercase leading-normal text-white shadow-[0_4px_9px_-4px_#3b71ca] transition duration-1000 ease-in-out hover:bg-blue-800 hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:bg-primary-600 focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] focus:outline-none focus:ring-0 active:bg-primary-700 active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.3),0_4px_18px_0_rgba(59,113,202,0.2)] dark:shadow-[0_4px_9px_-4px_rgba(59,113,202,0.5)] dark:hover:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:focus:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)] dark:active:shadow-[0_8px_9px_-4px_rgba(59,113,202,0.2),0_4px_18px_0_rgba(59,113,202,0.1)]  attendancesubmit"
+                            data-te-ripple-init data-te-ripple-color="light">Submit
+                        </button>
                         <!-- Register link -->
                         <p class="mb-0 mt-2 pt-1 text-sm font-semibold">
                             Register new student?
@@ -236,7 +248,7 @@
         history.replaceState(null, null, '/login');
     })
 
-    document.querySelectorAll('.manual-attendance')[0].addEventListener("submit", function(event) {
+    document.querySelectorAll('.manual-attendance')[0].addEventListener("submit", function (event) {
         event.preventDefault();
         var sid1 = document.querySelectorAll('.inputSid1')[0].value;
         var sid2 = document.querySelectorAll('.inputSid2')[0].value;
@@ -261,10 +273,32 @@
                 .catch(error => {
                     console.log('Error fetching data: ', error)
                 })
-        }      
+        }
         document.querySelector('.manual-attendance').submit();
     })
-    
+
+    let flag = 0;
+    let but = document.getElementById('camera-access');
+    let video = document.getElementById('video');
+    console.log('camera part accessed');
+    but.addEventListener("click", () => {
+        flag = flag + 1;
+        if (flag % 2 == 1) {
+            console.log("button clicked");
+            $('.loader').removeClass('hidden');
+            $('.loader').addClass('flex flex-col items-center');
+            video.src = "{% url 'video_feed' %}"
+            video.onload = function () {
+                // Hide the loader once the image is loaded
+                $('#video').removeClass('hidden');
+                $('.loader').addClass('hidden');
+            };
+        }
+        else {
+            document.location.reload();
+        }
+    })
+
 </script>
 
 </html>
