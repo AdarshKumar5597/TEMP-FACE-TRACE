@@ -34,4 +34,5 @@ urlpatterns = [
     path('get-data/', views.get_data, name='get_data'),
     path('user-is-valid/', views.userIsValid, name='UserIsValid'),
     path("__reload__/", include("django_browser_reload.urls")),
+    path("video_feed/", views.video_feed, name="video_feed"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

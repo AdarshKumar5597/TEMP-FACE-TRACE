@@ -1,10 +1,13 @@
 from django.shortcuts import render, redirect
-from django.http import HttpResponse, JsonResponse
+from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.contrib.auth import login, authenticate, logout
 from .models import Student, Attendance, Queries
 from tempfacetrace.forms import RegistrationForm, AccountAuthenticationForm
 from django.views.decorators.cache import never_cache
 import datetime
+import cv2
+import face_recognition
+import numpy as np
 
 
 def register(request):
@@ -178,3 +181,99 @@ def sendQuery(request):
             querybox = Queries(studentname=studentname, studentid=studentid, date=date, query=query, image = user.image if user.image else "images/man.png")
             querybox.save()
     return render(request, 'send-query.html')
+
+
+def face_attendance():
+    camera = cv2.VideoCapture(0)
+    Adarsh_image = face_recognition.load_image_file("media/images/21052130.jpg")
+    Adarsh_face_encoding = face_recognition.face_encodings(Adarsh_image)[0]
+
+    Sanu_image = face_recognition.load_image_file("media/images/101010.jpg")
+    Sanu_face_encoding = face_recognition.face_encodings(Sanu_image)[0]
+
+    known_face_encodings = [
+        Adarsh_face_encoding,
+        Sanu_face_encoding,
+    ]
+    known_face_names = [
+        "Adarsh",
+        "Sanu",
+    ]
+    known_face_studentids = [
+        "21052130",
+        "101010",
+    ]
+    # Initialize some variables
+    face_locations = []
+    face_encodings = []
+    while True:
+        success, frame = camera.read()  # read the camera frame
+        if not success:
+            break
+        else:
+            frame = cv2.flip(frame, 1)
+            # Resize frame of video to 1/4 size for faster face recognition processing
+            small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+            # Convert the image from BGR color (which OpenCV uses) to RGB color (which face_recognition uses)
+            rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+
+            # Only process every other frame of video to save time
+           
+            # Find all the faces and face encodings in the current frame of video
+            face_locations = face_recognition.face_locations(rgb_small_frame)
+            face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+            face_names = []
+            for face_encoding in face_encodings:
+                # See if the face is a match for the known face(s)
+                matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+                name = "Unknown"
+                # Or instead, use the known face with the smallest distance to the new face
+                face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+                best_match_index = np.argmin(face_distances)
+                if matches[best_match_index]:
+                    name = known_face_names[best_match_index]
+                    studentid = known_face_studentids[best_match_index]
+                    # print("Name: "+name+" Studentid: "+studentid)
+                    students = Student.objects.all()
+                    studentid_list = [student.studentid for student in students]
+                    found = int(studentid) in studentid_list
+                    if found:
+                        if not (Attendance.objects.filter(studentid = studentid, date = str(datetime.date.today()))):
+                            student = Student.objects.filter(studentid = studentid)
+                            student_present = Attendance(studentname = student[0].studentname, studentid = student[0].studentid, domain = student[0].domain, image = student[0].image if student[0].image else "", date = str(datetime.date.today()))
+                            student_present.save()
+                        else:
+                            name=known_face_names[best_match_index]+" -Attendance Taken!"
+                # face_names.append(name)
+            
+
+            # Display the results
+            for top, right, bottom, left in face_locations:
+                # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+                top *= 4
+                right *= 4
+                bottom *= 4
+                left *= 4
+
+                # Draw a box around the face
+                cv2.rectangle(frame, (left, top), (right, bottom), (50, 205, 154), 2)
+
+                # Draw a label with a name below the face
+                # cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                font = cv2.FONT_HERSHEY_DUPLEX
+                # Calculate the width of the text
+                text_width, _ = cv2.getTextSize(name, font, 1.0, 1)[0]
+
+                # Calculate the position to center the text
+                text_x = left + (right - left - text_width) // 2
+                text_y = bottom + 36
+                # Draw the text in the center
+                cv2.putText(frame, name, (text_x, text_y), font, 1.0, (0, 0, 255), 1)
+
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+def video_feed(request):
+    return StreamingHttpResponse(face_attendance(), content_type="multipart/x-mixed-replace;boundary=frame")
