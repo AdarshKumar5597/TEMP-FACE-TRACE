@@ -1,0 +1,159 @@
+{% load static tailwind_tags %}
+<html lang="en">
+
+<head>
+    {% tailwind_css %}
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Image Upload</title>
+    <style>
+        :root {
+            --custom-red: #e84949;
+            --custom-border-grad:
+        }
+
+        .content {
+            box-shadow: 15px 0px 50px 10px black;
+        }
+
+        .scanner {
+            border: 10px solid;
+            border-image-slice: 1;
+            border-width: 10px;
+            border-image-source: linear-gradient(to left, #00C853, #B2FF59);
+        }
+
+        .scanner-bar {
+            background-image: linear-gradient(to left, #1bc800, #fff959);
+            animation: linear-movement;
+            animation-duration: 2s;
+            animation-timing-function: ease-in;
+            animation-iteration-count: infinite;
+        }
+
+        @keyframes linear-movement {
+            0% {
+                top: 120px
+            }
+
+            50% {
+                top: 390px
+            }
+
+            100% {
+                top: 120px
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-[#E7E2FF] relative">
+    <div class="bg-[#f5b4e6] w-full h-full flex items-center justify-center">
+
+
+        <div class="absolute top-16 left-[380px] h-16 w-16 rounded-full bg-[#e84949]"></div>
+
+
+        <div class="absolute h-60 w-60 rounded-full bg-white bottom-6 right-[300px] z-10"></div>
+
+
+
+        <div class="max-w-[1080px] w-11/12 mx-auto my-auto flex bg-[#e84949] relative min-h-[680px] rounded-3xl">
+            <form enctype="multipart/form-data" method="post"
+                class="bg-white flex flex-col gap-y-4 justify-center items-center w-[50%] mb-0 rounded-3xl shadow-gray-500 shadow-lg content">
+                <h1 class="mt-3 font-pop text-black text-2xl font-extrabold"> {% csrf_token %}
+                    UPLOAD IMAGE
+                </h1>
+                <p class="font-pop">Upload Image and Details for Facial Recognition</p>
+
+                <div class="flex flex-col mt-10 gap-y-3">
+
+                    <div class="flex flex-col">
+                        <label for="name" class="">Name</label>
+                        <input type="text" name="Name" id="name"
+                            class="h-12 w-60 border-gray-300 border-[1px] rounded-lg bg-[#f5b4e6] p-2 text-red-700 font-bold font-pop focus:border-none"
+                            style="outline: none;" required autocomplete="name">
+                    </div>
+
+                    <div class="flex flex-col">
+                        <label for="rollno" class="">Roll no</label>
+                        <input type="number" name="Roll no" id="rollno"
+                            class="h-12 w-60 border-gray-300 border-[1px] rounded-lg bg-[#f5b4e6] p-2 text-red-700 font-bold font-pop focus:border-none"
+                            style="outline: none;" required autocomplete="off">
+
+                    </div>
+
+                    <!-- Image Upload Section -->
+                    <div class="my-auto mx-auto flex flex-col gap-y-3">
+                        <input type="file" name="image" id="imageUpload" accept="image/*" style="display: none;" required>
+                        <label for="imageUpload"
+                            class="cursor-pointer text-black font-bold bg-white p-2 px-4 rounded-lg hover:bg-gray-100 shadow-md hover:cursor-pointer">Upload
+                            Image</label>
+                        <p id="selectedImageName" class=" text-black"></p>
+                    </div>
+
+                </div>
+
+                <button type="submit"
+                    class="mt-3 p-4 px-10 bg-[#e84949] rounded-lg shadow-black shadow-md text-white font-bold font-pop">
+                    Submit
+                </button>
+
+
+                <div class="flex gap-x-2 font-pop">
+                    <p>Don't have account?</p>
+                    <a href="/register" class="font-pop font-bold">Register</a>
+                </div>
+
+            </form>
+            <div class="w-[50%] relative">
+                <div class="absolute w-[300px] rounded-full h-[10px] scanner-bar top-[200] z-30 right-[120]"></div>
+                <div class="absolute w-[350px] h-[320px] scanner top-[100] right-[100] rounded-3xl z-10"></div>
+
+                <!-- Existing animated image -->
+                <img src="../media/images/8f6ca0d9719dbc345b33465db44f06d9.jpg" id="previewImage"
+                    class="absolute h-[500px] w-[350px] rounded-3xl top-[100] right-[100]" alt="">
+
+            </div>
+
+            <script>
+                const imageUploadInput = document.getElementById("imageUpload");
+                const selectedImageName = document.getElementById("selectedImageName");
+                const previewImage = document.getElementById("previewImage");
+                const rollNumberField = document.getElementById("rollno");
+
+                let rollNumber;
+
+                rollNumberField.addEventListener("input", function () {
+                    rollNumber = rollNumberField.value;
+                });
+
+                imageUploadInput.addEventListener("change", function () {
+                    const file = this.files[0];
+                    if (file) {
+                        const newFileName = `${rollNumber}.jpg`;
+
+                        // Create a new Blob with the desired name
+                        const renamedFile = new Blob([file], { type: file.type });
+                        renamedFile.lastModifiedDate = new Date();
+                        renamedFile.name = newFileName;
+
+                        selectedImageName.textContent = `Selected Image: ${newFileName}`;
+                        previewImage.style.display = "block";
+
+                        const reader = new FileReader();
+                        reader.onload = function (e) {
+                            previewImage.src = e.target.result;
+                        };
+                        reader.readAsDataURL(renamedFile);
+                    } else {
+                        selectedImageName.textContent = "";
+                        previewImage.style.display = "none";
+                    }
+                });
+            </script>
+        </div>
+    </div>
+</body>
+
+</html>

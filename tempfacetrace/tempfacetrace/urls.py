@@ -35,4 +35,5 @@ urlpatterns = [
     path('user-is-valid/', views.userIsValid, name='UserIsValid'),
     path("__reload__/", include("django_browser_reload.urls")),
     path("video_feed/", views.video_feed, name="video_feed"),
+    path("image-upload/", views.image_upload, name="image_upload"),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

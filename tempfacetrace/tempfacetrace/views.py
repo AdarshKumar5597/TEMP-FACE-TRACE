@@ -1,8 +1,8 @@
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, JsonResponse, StreamingHttpResponse
 from django.contrib.auth import login, authenticate, logout
-from .models import Student, Attendance, Queries
-from tempfacetrace.forms import RegistrationForm, AccountAuthenticationForm
+from .models import Student, Attendance, Queries, ImageDetails
+from tempfacetrace.forms import RegistrationForm, AccountAuthenticationForm, ImageDetailsUploadForm
 from django.views.decorators.cache import never_cache
 import datetime
 import cv2
@@ -185,24 +185,20 @@ def sendQuery(request):
 
 def face_attendance():
     camera = cv2.VideoCapture(0)
-    Adarsh_image = face_recognition.load_image_file("media/images/21052130.jpg")
-    Adarsh_face_encoding = face_recognition.face_encodings(Adarsh_image)[0]
 
-    Sanu_image = face_recognition.load_image_file("media/images/101010.jpg")
-    Sanu_face_encoding = face_recognition.face_encodings(Sanu_image)[0]
 
-    known_face_encodings = [
-        Adarsh_face_encoding,
-        Sanu_face_encoding,
-    ]
-    known_face_names = [
-        "Adarsh",
-        "Sanu",
-    ]
-    known_face_studentids = [
-        "21052130",
-        "101010",
-    ]
+    imageDetails = ImageDetails.objects.all()
+    known_face_encodings = []
+    known_face_names = [imageDetail.studentname for imageDetail in imageDetails]
+    known_face_studentids = [imageDetail.studentid for imageDetail in imageDetails]
+    name = "Unknown"
+
+
+    for imageDetail in imageDetails:
+        image = face_recognition.load_image_file(f"media/{imageDetail.image}")
+        image_encoding = face_recognition.face_encodings(image)[0]
+        known_face_encodings.append(image_encoding)
+
     # Initialize some variables
     face_locations = []
     face_encodings = []
@@ -223,28 +219,28 @@ def face_attendance():
             face_locations = face_recognition.face_locations(rgb_small_frame)
             face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
             face_names = []
-            for face_encoding in face_encodings:
-                # See if the face is a match for the known face(s)
-                matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
-                name = "Unknown"
-                # Or instead, use the known face with the smallest distance to the new face
-                face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
-                best_match_index = np.argmin(face_distances)
-                if matches[best_match_index]:
-                    name = known_face_names[best_match_index]
-                    studentid = known_face_studentids[best_match_index]
-                    # print("Name: "+name+" Studentid: "+studentid)
-                    students = Student.objects.all()
-                    studentid_list = [student.studentid for student in students]
-                    found = int(studentid) in studentid_list
-                    if found:
-                        if not (Attendance.objects.filter(studentid = studentid, date = str(datetime.date.today()))):
-                            student = Student.objects.filter(studentid = studentid)
-                            student_present = Attendance(studentname = student[0].studentname, studentid = student[0].studentid, domain = student[0].domain, image = student[0].image if student[0].image else "", date = str(datetime.date.today()))
-                            student_present.save()
-                        else:
-                            name=known_face_names[best_match_index]+" -Attendance Taken!"
-                # face_names.append(name)
+            if len(face_encodings) > 0:
+                for face_encoding in face_encodings:
+                    # See if the face is a match for the known face(s)
+                    matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+                    # Or instead, use the known face with the smallest distance to the new face
+                    face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
+                    best_match_index = np.argmin(face_distances)
+                    if matches[best_match_index]:
+                        name = known_face_names[best_match_index]
+                        studentid = known_face_studentids[best_match_index]
+                        # print("Name: "+name+" Studentid: "+studentid)
+                        students = Student.objects.all()
+                        studentid_list = [student.studentid for student in students]
+                        found = int(studentid) in studentid_list
+                        if found:
+                            if not (Attendance.objects.filter(studentid = studentid, date = str(datetime.date.today()))):
+                                student = Student.objects.filter(studentid = studentid)
+                                student_present = Attendance(studentname = student[0].studentname, studentid = student[0].studentid, domain = student[0].domain, image = student[0].image if student[0].image else "", date = str(datetime.date.today()))
+                                student_present.save()
+                            else:
+                                name=known_face_names[best_match_index]+" -Attendance Taken!"
+                    # face_names.append(name)
             
 
             # Display the results
@@ -277,3 +273,28 @@ def face_attendance():
 
 def video_feed(request):
     return StreamingHttpResponse(face_attendance(), content_type="multipart/x-mixed-replace;boundary=frame")
+
+
+def image_upload(request):
+    admins = Student.objects.filter(is_admin = True)
+
+    if request.method == 'POST':
+        studentName = request.POST.get("Name")
+        studentRollno = request.POST.get("Roll no")
+        image = request.FILES.get("image")
+        
+        student = Student.objects.filter(studentid = studentRollno)
+
+        if (len(student) > 0):
+            imageDetail = ImageDetails.objects.filter(studentid = studentRollno)
+            if len(imageDetail) == 0:
+                imageDetails = ImageDetails(studentname = studentName, studentid = studentRollno, image = image)
+                imageDetails.save()
+
+                form = ImageDetailsUploadForm(request.POST, request.FILES)
+                if form.is_valid():
+                    form.save()
+                    return redirect('Login')
+            else:
+                print("Image details already exists")
+    return render(request, "image-upload.html")

@@ -140,7 +140,7 @@
             <div
                 class="flex bg-[#e84949] flex-col justify-center gap-y-3 rounded-md rounded-tl-full border-white border-[2px] h-[65%] p-5 self-end mb-2">
                 <i class='bx bxs-camera text-white text-xl hover:cursor-pointer hover:scale-[200%] transition-all duration-200' id="camera-access"></i>
-                <i class='bx bxs-toggle-right text-white text-xl'></i>
+                <a href="{% url 'image_upload' %}"><i class='bx bxs-toggle-right text-white text-xl'></i></a>
                 <i class='bx bx-toggle-right text-white text-xl'></i>
             </div>
 
@@ -280,11 +280,9 @@
     let flag = 0;
     let but = document.getElementById('camera-access');
     let video = document.getElementById('video');
-    console.log('camera part accessed');
     but.addEventListener("click", () => {
         flag = flag + 1;
         if (flag % 2 == 1) {
-            console.log("button clicked");
             $('.loader').removeClass('hidden');
             $('.loader').addClass('flex flex-col items-center');
             video.src = "{% url 'video_feed' %}"

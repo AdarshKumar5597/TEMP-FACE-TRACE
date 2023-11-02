@@ -1,5 +1,6 @@
 from django.db import models
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager
+import os
 
 class MyStudentManager(BaseUserManager):
     def create_user(self, email, studentid, studentname, password=None):
@@ -91,3 +92,31 @@ class Queries(models.Model):
     
     class Meta:
         db_table = 'queriesdb'
+
+
+
+def path_and_rename(instance, filename):
+    upload_to = 'imagesForFacialRecognition'
+    first = filename.split('.')[0]
+    ext = filename.split('.')[-1]
+    # get filename
+    if instance.pk:
+        filename = '{}.{}'.format(instance.pk, ext)
+    else:
+        # set filename as random string
+        filename = '{}.{}'.format(first, ext)
+    # return the whole path to the file
+    return os.path.join(upload_to, filename)
+
+
+
+class ImageDetails(models.Model):
+    studentname = models.CharField(max_length=50)
+    studentid = models.IntegerField(primary_key=True)
+    image = models.ImageField(upload_to=path_and_rename)
+
+    def __str__(self) -> str:
+        return self.studentname
+    
+    class Meta:
+        db_table = 'imagedetailsdb'
