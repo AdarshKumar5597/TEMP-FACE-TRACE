@@ -8,6 +8,7 @@ import datetime
 import cv2
 import face_recognition
 import numpy as np
+import time
 
 
 def register(request):
@@ -132,7 +133,7 @@ def student(request):
                     student = Student.objects.filter(studentid = studentid)
                     student_present = Attendance(studentname = student[0].studentname, studentid = student[0].studentid, domain = student[0].domain, image = student[0].image if student[0].image else "", date = str(datetime.date.today()))
                     student_present.save()
-    return render(request, 'normal-user.html', {'studentname':user.studentname})
+    return render(request, 'normal-user.html', {'studentname':user.studentname, 'studentid':user.studentid})
 
 
 def profile(request):
@@ -183,9 +184,8 @@ def sendQuery(request):
     return render(request, 'send-query.html')
 
 
-def face_attendance():
+def face_attendance(id):
     camera = cv2.VideoCapture(0)
-
 
     imageDetails = ImageDetails.objects.all()
     known_face_encodings = []
@@ -198,6 +198,18 @@ def face_attendance():
         image = face_recognition.load_image_file(f"media/{imageDetail.image}")
         image_encoding = face_recognition.face_encodings(image)[0]
         known_face_encodings.append(image_encoding)
+
+    if (id):
+        imageDetailsOfCurrentStudentId = ImageDetails.objects.filter(studentid = id)
+        if len(imageDetailsOfCurrentStudentId) > 0:
+            known_face_names = [imageDetailsOfCurrentStudentId[0].studentname]
+            known_face_studentids = [id]
+            image = face_recognition.load_image_file(f"media/{imageDetailsOfCurrentStudentId[0].image}")
+            image_encoding = face_recognition.face_encodings(image)[0]
+            known_face_encodings = []
+            known_face_encodings.append(image_encoding)
+            print(known_face_names)
+            print(known_face_studentids)
 
     # Initialize some variables
     face_locations = []
@@ -226,7 +238,7 @@ def face_attendance():
                     # Or instead, use the known face with the smallest distance to the new face
                     face_distances = face_recognition.face_distance(known_face_encodings, face_encoding)
                     best_match_index = np.argmin(face_distances)
-                    if matches[best_match_index]:
+                    if matches[best_match_index] == True:
                         name = known_face_names[best_match_index]
                         studentid = known_face_studentids[best_match_index]
                         # print("Name: "+name+" Studentid: "+studentid)
@@ -270,8 +282,101 @@ def face_attendance():
             frame = buffer.tobytes()
             yield (b'--frame\r\n'
                    b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+            
+
+
+
+def face_attendance_for_normal_student(id):
+    camera = cv2.VideoCapture(0)
+    name = "Unknown"
+    result = []
+    desired_execution_time = 10  # in seconds
+    start_time = time.time()
+
+    if (id):
+        imageDetailsOfCurrentStudentId = ImageDetails.objects.filter(studentid = id)
+        if len(imageDetailsOfCurrentStudentId) > 0:
+            known_face_names = [imageDetailsOfCurrentStudentId[0].studentname]
+            known_face_studentids = [id]
+            image = face_recognition.load_image_file(f"media/{imageDetailsOfCurrentStudentId[0].image}")
+            image_encoding = face_recognition.face_encodings(image)[0]
+            known_face_encodings = []
+            known_face_encodings.append(image_encoding)
+            print(known_face_names)
+            print(known_face_studentids)
+
+    # Initialize some variables
+    face_locations = []
+    face_encodings = []
+    while True:
+        if time.time() - start_time >= desired_execution_time:
+            break
+        success, frame = camera.read()  # read the camera frame
+        if not success:
+            break
+        else:
+            frame = cv2.flip(frame, 1)
+            small_frame = cv2.resize(frame, (0, 0), fx=0.25, fy=0.25)
+            rgb_small_frame = cv2.cvtColor(small_frame, cv2.COLOR_BGR2RGB)
+            face_locations = face_recognition.face_locations(rgb_small_frame)
+            face_encodings = face_recognition.face_encodings(rgb_small_frame, face_locations)
+            if len(face_encodings) > 0:
+                for face_encoding in face_encodings:
+                    matches = face_recognition.compare_faces(known_face_encodings, face_encoding)
+                    result.append(matches[0])
+                    
+            if result.count(True) > result.count(False):
+                    name = known_face_names[0]
+                    studentid = known_face_studentids[0]
+                    students = Student.objects.all()
+                    studentid_list = [student.studentid for student in students]
+                    found = int(studentid) in studentid_list
+                    if found:
+                        if not (Attendance.objects.filter(studentid = studentid, date = str(datetime.date.today()))):
+                            student = Student.objects.filter(studentid = studentid)
+                            student_present = Attendance(studentname = student[0].studentname, studentid = student[0].studentid, domain = student[0].domain, image = student[0].image if student[0].image else "", date = str(datetime.date.today())) 
+                            student_present.save()
+                        else:
+                            name=known_face_names[0]+" -Attendance Taken!"
+            
+
+            # Display the results
+            for top, right, bottom, left in face_locations:
+                # Scale back up face locations since the frame we detected in was scaled to 1/4 size
+                top *= 4
+                right *= 4
+                bottom *= 4
+                left *= 4
+
+                # Draw a box around the face
+                cv2.rectangle(frame, (left, top), (right, bottom), (50, 205, 154), 2)
+
+                # Draw a label with a name below the face
+                # cv2.rectangle(frame, (left, bottom - 35), (right, bottom), (0, 0, 255), cv2.FILLED)
+                font = cv2.FONT_HERSHEY_DUPLEX
+                # Calculate the width of the text
+                text_width, _ = cv2.getTextSize(name, font, 1.0, 1)[0]
+
+                # Calculate the position to center the text
+                text_x = left + (right - left - text_width) // 2
+                text_y = bottom + 36
+                # Draw the text in the center
+                cv2.putText(frame, name, (text_x, text_y), font, 1.0, (0, 0, 255), 1)
+
+            ret, buffer = cv2.imencode('.jpg', frame)
+            frame = buffer.tobytes()
+            yield (b'--frame\r\n'
+                   b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n')
+
+
+
+
+
 
 def video_feed(request):
+    currentStudentId = request.GET.get('param1')
+    if (currentStudentId):
+        return StreamingHttpResponse(face_attendance_for_normal_student(currentStudentId), content_type="multipart/x-mixed-replace;boundary=frame")
     return StreamingHttpResponse(face_attendance(), content_type="multipart/x-mixed-replace;boundary=frame")
 
 

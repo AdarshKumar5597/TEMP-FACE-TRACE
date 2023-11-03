@@ -143,9 +143,21 @@
         <div
             class="bg-gray-400 rounded-tl-full rounded-bl-full h-full w-full opacity-70 flex flex-row items-center pl-16">
 
-            <video class="rounded-lg border-white border-[1px] web-cam-student flex items-center justify-center"
-                id="vid-student">
-            </video>
+            <!--Video part-->
+            <!--loading part-->
+            <div class="hidden loader-normal-student justify-center">
+                <div
+                    class='flex space-x-2 justify-center bg-white items-center dark:invert w-[200px] h-[100px] bg-inherit'>
+                    <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
+                    <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
+                    <div class='h-8 w-8 bg-black rounded-full animate-bounce'></div>
+                </div>
+                <span class="text-white text-xl font-bold">Loading...</span>
+            </div>
+            <div id="student-id" studentid-variable="{{ studentid }}"></div>
+            <img class="rounded-lg border-white border-[1px] self-end mb-8 w-[500px] h-[300px] hidden" id="video-normal-student" >
+
+
 
             <form action=""
                 class="bg-white flex flex-col gap-y-4 justify-center items-center w-[50%] rounded-3xl shadow-gray-500 shadow-lg content mx-auto p-10 manual-attendance"
@@ -188,10 +200,14 @@
         </div>
 
     </div>
-    <script src="{% static 'index.js' %}"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 </body>
 
 <script>
+
+    var studentID = document.getElementById('student-id').getAttribute('studentid-variable');
+    videoApi = `http://127.0.0.1:8000/video_feed/?param1=${studentID}`
+
     btnlogout = document.querySelectorAll('.logout')
     btnlogout[0].addEventListener('click', function () {
         history.replaceState(null, null, '/login');
@@ -238,51 +254,37 @@
 
     let flagStudent = false;
     document.addEventListener("keydown", function (event) {
+        console.log("Inside keydown part")
         const activeElement = document.activeElement;
         // Check if the active element is an input or textarea before preventing the default behavior
         if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
             return;
         }
         event.preventDefault();
-        let cameraPartStudent = document.querySelector('.web-cam-student');
-        let videoStudent = document.getElementById("vid-student");
-        let mediaDevices = navigator.mediaDevices;
-        videoStudent.muted = true;
+        let video = document.getElementById("video-normal-student");
         const key = event.key;
         if (key === "o" && event.altKey) {
+            console.log("inside alt+o part")
             flagStudent = true;
         }
         if (key === "c" && event.altKey) {
+            console.log("inside alt+c part")
             flagStudent = false;
         }
-        mediaDevices
-            .getUserMedia({
-                video: true,
-                audio: true,
-            })
-            .then((stream) => {
-                if (flagStudent) {
-                    cameraPartStudent.style.background = "#E84949"
-                    cameraPartStudent.style.boxShadow = "10px 10px 30px 0 rgba(0, 0, 0, 1)"
-                    videoStudent.srcObject = stream;
-                    videoStudent.addEventListener("loadedmetadata", () => {
-                        videoStudent.play();
-                    });
-                }
-                else {
-                    cameraPartStudent.style.background = "";
-                    cameraPartStudent.style.boxShadow = "";
-                    window.localStream = stream;
-                    stream.getTracks().forEach((track) => {
-                        track.stop();
-                    });
-                    videoStudent.srcObject = null;
-                    location.reload();
-                }
-            })
-            .catch((err)=> {
-                alert(err);
-            });
+        if (flagStudent) {
+            console.log("inside camera logic part")
+            $('.loader-normal-student').removeClass('hidden');
+            $('.loader-normal-student').addClass('flex flex-col items-center');
+            video.src = videoApi;
+            video.onload = function () {
+                // Hide the loader once the image is loaded
+                $('#video-normal-student').removeClass('hidden');
+                $('.loader-normal-student').addClass('hidden');
+            };
+        }
+        else {
+            document.location.reload();
+        }
 
     });
 </script>
