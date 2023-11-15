@@ -137,17 +137,17 @@
     <!--main-->
     <div id="main"
         class="bg-[#e84949] p-24 pt-10 pr-0 flex flex-col justify-evenly items-center rounded-tl-full rounded-bl-full">
-        <div class="text-white font-extrabold text-3xl mb-10">
-            Press O to take Virtual Attendance.
+        <div class="text-white font-extrabold text-3xl mb-10 heading">
+            Press Alt + O to take Virtual Attendance.
         </div>
         <div
-            class="bg-gray-400 rounded-tl-full rounded-bl-full h-full w-full opacity-70 flex flex-row items-center pl-16">
+            class="bg-gray-400 rounded-tl-full rounded-bl-full h-full w-full opacity-70 flex flex-row items-center justify-evenly pl-16">
 
             <!--Video part-->
             <!--loading part-->
             <div class="hidden loader-normal-student justify-center">
                 <div
-                    class='flex space-x-2 justify-center bg-white items-center dark:invert w-[200px] h-[100px] bg-inherit'>
+                    class='flex space-x-2 justify-center bg-white items-center dark:invert w-[200px] h-[100px] bg-inherit rounded-lg'>
                     <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.3s]'></div>
                     <div class='h-8 w-8 bg-black rounded-full animate-bounce [animation-delay:-0.15s]'></div>
                     <div class='h-8 w-8 bg-black rounded-full animate-bounce'></div>
@@ -155,7 +155,7 @@
                 <span class="text-white text-xl font-bold">Loading...</span>
             </div>
             <div id="student-id" studentid-variable="{{ studentid }}"></div>
-            <img class="rounded-lg border-white border-[1px] self-end mb-8 w-[500px] h-[300px] hidden" id="video-normal-student" >
+            <img class="rounded-lg border-white border-[1px] mb-8 w-[500px] h-[300px] hidden" id="video-normal-student" >
 
 
 
@@ -254,8 +254,8 @@
 
     let flagStudent = false;
     document.addEventListener("keydown", function (event) {
-        console.log("Inside keydown part")
         const activeElement = document.activeElement;
+        const heading = document.querySelector('.heading')
         // Check if the active element is an input or textarea before preventing the default behavior
         if (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA') {
             return;
@@ -264,15 +264,14 @@
         let video = document.getElementById("video-normal-student");
         const key = event.key;
         if (key === "o" && event.altKey) {
-            console.log("inside alt+o part")
             flagStudent = true;
+            heading.textContent = "Press Alt + C to Close Virtual Attendance"
         }
         if (key === "c" && event.altKey) {
-            console.log("inside alt+c part")
             flagStudent = false;
+            heading.textContent = "Press Alt + O to take Virtual Attendance."
         }
         if (flagStudent) {
-            console.log("inside camera logic part")
             $('.loader-normal-student').removeClass('hidden');
             $('.loader-normal-student').addClass('flex flex-col items-center');
             video.src = videoApi;

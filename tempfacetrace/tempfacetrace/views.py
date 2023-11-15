@@ -184,7 +184,7 @@ def sendQuery(request):
     return render(request, 'send-query.html')
 
 
-def face_attendance(id):
+def face_attendance():
     camera = cv2.VideoCapture(0)
 
     imageDetails = ImageDetails.objects.all()
@@ -198,18 +198,6 @@ def face_attendance(id):
         image = face_recognition.load_image_file(f"media/{imageDetail.image}")
         image_encoding = face_recognition.face_encodings(image)[0]
         known_face_encodings.append(image_encoding)
-
-    if (id):
-        imageDetailsOfCurrentStudentId = ImageDetails.objects.filter(studentid = id)
-        if len(imageDetailsOfCurrentStudentId) > 0:
-            known_face_names = [imageDetailsOfCurrentStudentId[0].studentname]
-            known_face_studentids = [id]
-            image = face_recognition.load_image_file(f"media/{imageDetailsOfCurrentStudentId[0].image}")
-            image_encoding = face_recognition.face_encodings(image)[0]
-            known_face_encodings = []
-            known_face_encodings.append(image_encoding)
-            print(known_face_names)
-            print(known_face_studentids)
 
     # Initialize some variables
     face_locations = []
@@ -290,7 +278,7 @@ def face_attendance_for_normal_student(id):
     camera = cv2.VideoCapture(0)
     name = "Unknown"
     result = []
-    desired_execution_time = 10  # in seconds
+    desired_execution_time = 5  # in seconds
     start_time = time.time()
 
     if (id):
@@ -302,8 +290,6 @@ def face_attendance_for_normal_student(id):
             image_encoding = face_recognition.face_encodings(image)[0]
             known_face_encodings = []
             known_face_encodings.append(image_encoding)
-            print(known_face_names)
-            print(known_face_studentids)
 
     # Initialize some variables
     face_locations = []
@@ -370,9 +356,6 @@ def face_attendance_for_normal_student(id):
 
 
 
-
-
-
 def video_feed(request):
     currentStudentId = request.GET.get('param1')
     if (currentStudentId):
@@ -382,7 +365,6 @@ def video_feed(request):
 
 def image_upload(request):
     admins = Student.objects.filter(is_admin = True)
-
     if request.method == 'POST':
         studentName = request.POST.get("Name")
         studentRollno = request.POST.get("Roll no")
